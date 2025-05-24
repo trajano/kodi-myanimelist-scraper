@@ -10,9 +10,9 @@ class CustomBuildHook(BuildHookInterface):
         addon = Element(
             "addon",
             {
-                "id": metadata.name,
+                "id": metadata.name.replace("-","."),
                 "version": version,
-                "name": metadata.name,
+                "name": metadata.description,
                 "provider-name": metadata.authors_data.get("name", [""])[0]
                 if metadata.authors_data
                 else "",
