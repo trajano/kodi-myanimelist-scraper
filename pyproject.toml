@@ -1,7 +1,7 @@
 [project]
 name = "metadata.myanimelist.tv"
 version = "0.1.0"
-description = "Add your description here"
+description = "MyAnimeList TV Scraper"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = ["cloudscraper>=1.2.71", "pillow>=11.2.1"]
@@ -33,7 +33,10 @@ build-backend = "hatchling.build"
 # Top-level folder name inside the ZIP
 install-name = "metadata.myanimelist.tv"
 # Include everything in the project root
-sources = ["/src", "/addon.xml"]
-[tool.hatch.build.targets.zipped-directory.force-include]
-"./addon.xml" = "./addon.xml"
+#only-include=["src/"]
+sources = ["src/"]
+exclude=["uv.lock","hatch_build.py","pyproject.toml",".??*"]
+artifacts =[
+    "addon.xml"
+]
 [tool.hatch.build.hooks.custom]
