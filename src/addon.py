@@ -1,9 +1,7 @@
 import sys
 import urllib.parse
 
-import xbmcgui
 import xbmcplugin
-import xbmc
 
 
 def get_params():
@@ -15,5 +13,5 @@ def get_params():
 
 params = get_params()
 plugin_handle = int(sys.argv[1])
-action = params.get('action')
+action = params.get("action")
 xbmcplugin.endOfDirectory(plugin_handle)

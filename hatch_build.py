@@ -10,7 +10,7 @@ class CustomBuildHook(BuildHookInterface):
         addon = Element(
             "addon",
             {
-                "id": metadata.name.replace("-","."),
+                "id": metadata.name.replace("-", "."),
                 "version": version,
                 "name": metadata.description,
                 "provider-name": metadata.authors_data.get("name", [""])[0]
@@ -55,7 +55,7 @@ class CustomBuildHook(BuildHookInterface):
             "extension",
             {"point": "xbmc.addon.metadata"},
         )
-        
+
         SubElement(addon_metadata, "summary").text = metadata.description
         SubElement(addon_metadata, "description").text = metadata.readme
         SubElement(addon_metadata, "platform").text = "all"
