@@ -2,11 +2,13 @@ import sys
 import urllib.parse
 import xbmc
 import xbmcplugin
+
 # from metadata_myanimelist_tv import route
-from typing import List, Dict, Optional
+from typing import Dict
+
 
 def get_params() -> Dict[str, str]:
-# def get_params():
+    # def get_params():
     param_string = sys.argv[2][1:]
     if param_string:
         return dict(urllib.parse.parse_qsl(param_string))
