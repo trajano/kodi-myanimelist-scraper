@@ -3,8 +3,9 @@ name = "metadata.myanimelist.tv"
 version = "0.1.0"
 description = "MyAnimeList TV Scraper"
 readme = "README.md"
-requires-python = ">=3.13"
-dependencies = ["cloudscraper>=1.2.71", "pillow>=11.2.1"]
+# https://kodi.wiki/view/Python_libraries
+requires-python = ">=3.8,<3.9"
+dependencies = ["cloudscraper>=1.2.71", "pillow"]
 authors = [{ name = "Archimedes Trajano" }]
 license = "EPL-2.0"
 [tool.uv]
@@ -14,8 +15,8 @@ package = true
 dev = [
     "hatch>=1.14.1",
     "kodistubs>=21.0.0",
-    "poethepoet>=0.34.0",
-    "pre-commit>=4.2.0",
+    "poethepoet",
+    "pre-commit",
     "pyright>=1.1.401",
     "pytest>=8.3.5",
     "ruff>=0.11.11",
@@ -23,7 +24,7 @@ dev = [
 
 
 [build-system]
-requires = ["hatchling", "hatch-zipped-directory"]
+requires = ["hatchling", "hatch-zipped-directory", "strip-hints"]
 #requires    = ["hatchling"]
 build-backend = "hatchling.build"
 
