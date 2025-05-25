@@ -5,7 +5,11 @@ description = "MyAnimeList TV Scraper"
 readme = "README.md"
 # https://kodi.wiki/view/Python_libraries
 requires-python = ">=3.8,<3.9"
-dependencies = ["cloudscraper>=1.2.71", "pillow"]
+dependencies = [
+    "cloudscraper>=1.2.71",
+ "dataclasses-json>=0.6.7",
+ "pillow",
+]
 authors = [{ name = "Archimedes Trajano" }]
 license = "EPL-2.0"
 [tool.uv]

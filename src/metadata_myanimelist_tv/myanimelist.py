@@ -1,21 +1,56 @@
 from dataclasses import dataclass
+from dataclasses_json import dataclass_json, Undefined, CatchAll
 from requests import get
+from typing import List, Optional
 
 
+@dataclass_json
 @dataclass
-class MyAnimeListMainPicture:
+class MyAnimeListPicture:
     medium: str
-    large: str | None
+    large: Optional[str]
 
     def url(self) -> str:
         return self.large or self.medium
 
 
+@dataclass_json
+@dataclass
+class MyAnimeListGenre:
+    id: int
+    name: str
+
+
+@dataclass_json
+@dataclass
+class MyAnimeListStudio:
+    id: int
+    name: str
+
+
+@dataclass_json(undefined=Undefined.INCLUDE)
+@dataclass
+class MyAnimeListAlternativeTitles:
+    synonyms: List[str]
+    titles: CatchAll
+
+
+@dataclass_json
 @dataclass
 class MyAnimeListAnime:
     id: int
     title: str
-    main_pictuture: MyAnimeListMainPicture
+    main_picture: MyAnimeListPicture
+    synopsis: Optional[str]
+    start_date: Optional[str]
+    mean: Optional[float]
+    genres: Optional[List[MyAnimeListGenre]]
+    num_episodes: Optional[int]
+    rating: Optional[str]
+    studios: Optional[List[MyAnimeListStudio]]
+    pictures: Optional[List[MyAnimeListPicture]]
+    background: Optional[str]
+    alternative_titles: Optional[MyAnimeListAlternativeTitles]
 
 
 class MyAnimeList:
