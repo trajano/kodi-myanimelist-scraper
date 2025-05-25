@@ -1,6 +1,12 @@
 from dataclasses import dataclass, field
 from datetime import date
-from dataclasses_json import dataclass_json, Undefined, CatchAll, config
+from dataclasses_json import (
+    dataclass_json,
+    Undefined,
+    CatchAll,
+    config,
+    DataClassJsonMixin,
+)
 from requests import get
 from typing import List, Optional, Set
 from marshmallow import fields
@@ -8,7 +14,7 @@ from marshmallow import fields
 
 @dataclass_json
 @dataclass
-class MyAnimeListPicture:
+class MyAnimeListPicture(DataClassJsonMixin):
     medium: str
     large: Optional[str]
 
@@ -18,31 +24,34 @@ class MyAnimeListPicture:
 
 @dataclass_json
 @dataclass
-class MyAnimeListGenre:
+class MyAnimeListGenre(DataClassJsonMixin):
     id: int
     name: str
 
 
 @dataclass_json
 @dataclass
-class MyAnimeListStudio:
+class MyAnimeListStudio(DataClassJsonMixin):
     id: int
     name: str
 
 
 @dataclass_json(undefined=Undefined.INCLUDE)
 @dataclass
-class MyAnimeListAlternativeTitles:
+class MyAnimeListAlternativeTitles(DataClassJsonMixin):
     synonyms: List[str]
     titles: CatchAll
 
     def all_titles(self) -> Set[str]:
-        return set(self.synonyms) | set(self.titles.values())
+        if isinstance(self.titles, dict):
+            return set(self.synonyms) | set(self.titles.values())
+        else:
+            return set(self.synonyms)
 
 
 @dataclass_json
 @dataclass
-class MyAnimeListAnime:
+class MyAnimeListAnime(DataClassJsonMixin):
     id: int
     title: str
     main_picture: MyAnimeListPicture
