@@ -1,7 +1,9 @@
-from dataclasses import dataclass
-from dataclasses_json import dataclass_json, Undefined, CatchAll
+from dataclasses import dataclass, field
+from datetime import date
+from dataclasses_json import dataclass_json, Undefined, CatchAll, config
 from requests import get
-from typing import List, Optional
+from typing import List, Optional, Set
+from marshmallow import fields
 
 
 @dataclass_json
@@ -34,6 +36,9 @@ class MyAnimeListAlternativeTitles:
     synonyms: List[str]
     titles: CatchAll
 
+    def all_titles(self) -> Set[str]:
+        return set(self.synonyms) | set(self.titles.values())
+
 
 @dataclass_json
 @dataclass
@@ -42,7 +47,7 @@ class MyAnimeListAnime:
     title: str
     main_picture: MyAnimeListPicture
     synopsis: Optional[str]
-    start_date: Optional[str]
+
     mean: Optional[float]
     genres: Optional[List[MyAnimeListGenre]]
     num_episodes: Optional[int]
@@ -51,6 +56,26 @@ class MyAnimeListAnime:
     pictures: Optional[List[MyAnimeListPicture]]
     background: Optional[str]
     alternative_titles: Optional[MyAnimeListAlternativeTitles]
+
+    start_date: Optional[date] = field(
+        default=None,
+        metadata=config(
+            encoder=date.isoformat, decoder=date.fromisoformat, mm_field=fields.Date()
+        ),
+    )
+    end_date: Optional[date] = field(
+        default=None,
+        metadata=config(
+            encoder=date.isoformat, decoder=date.fromisoformat, mm_field=fields.Date()
+        ),
+    )
+
+    def all_titles(self) -> Set[str]:
+        # gather alt titles if present, then add the main title
+        alt_set = (
+            self.alternative_titles.all_titles() if self.alternative_titles else set()
+        )
+        return alt_set | {self.title}
 
 
 class MyAnimeList:
