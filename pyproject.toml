@@ -36,7 +36,7 @@ install-name = "metadata.myanimelist.tv"
 # Include everything in the project root
 #only-include=["src/"]
 sources = ["src/"]
-exclude=["uv.lock","hatch_build.py","pyproject.toml",".??*"]
+exclude=["uv.lock","hatch_build.py","pyproject.toml",".??*","test"]
 artifacts =[
     "addon.xml"
 ]
