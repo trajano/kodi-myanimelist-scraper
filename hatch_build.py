@@ -47,7 +47,10 @@ class CustomBuildHook(BuildHookInterface):
         SubElement(
             addon,
             "extension",
-            {"point": "xbmc.metadata.scraper.tvshows", "library": "addon.py"},
+            {
+                "point": "xbmc.metadata.scraper.tvshows",
+                "library": "metadata_myanimelist_tv/addon.py",
+            },
         )
 
         addon_metadata = SubElement(

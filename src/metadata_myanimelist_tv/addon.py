@@ -2,7 +2,7 @@ import sys
 import urllib.parse
 import xbmcplugin
 
-from metadata_myanimelist_tv import route
+from .router import route
 from typing import Dict
 
 
