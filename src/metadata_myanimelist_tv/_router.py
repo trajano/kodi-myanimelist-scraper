@@ -31,13 +31,14 @@ def find(
     mal = MyAnimeList(settings.client_id)
     result = mal.find_anime(title)
     for anime in [item.node for item in result.data]:
-        liz = xbmcgui.ListItem(anime.title, "", offscreen=True)
-        xbmcplugin.addDirectoryItem(
-            handle=plugin_handle,
-            url=f"myanimelist:/anime/{anime.id}",
-            listitem=liz,
-            isFolder=True,
-        )
+        for title in anime.all_titles:
+            liz = xbmcgui.ListItem(title, offscreen=True)
+            xbmcplugin.addDirectoryItem(
+                handle=plugin_handle,
+                url=f"myanimelist:/anime/{anime.id}",
+                listitem=liz,
+                isFolder=True,
+            )
 
 
 def getdetails(*, plugin_handle: int, settings: AddOnSettings, url: str):
