@@ -16,6 +16,27 @@ class AnimeNewsNetworkTitle:
 
 
 @dataclass
+class AnimeNewsNetworkCastMember:
+    lang: str
+    role: str
+    person: str
+
+    def __init__(self, el: ET.Element):
+        self.lang = el.attrib["lang"]
+        self.role = next(el.iter("role")).text or "unknown"
+        self.person = next(el.iter("person")).text or "unknown"
+
+    @property
+    def order(self) -> int:
+        if self.lang == "JA":
+            return 1
+        elif self.lang == "EN":
+            return 2
+        else:
+            return 3
+
+
+@dataclass
 class AnimeNewsNetworkEpisode:
     number: int
     titles: List[AnimeNewsNetworkTitle]
@@ -38,6 +59,7 @@ class AnimeNewsNetworkEncyclopediaEntry:
     type: str
     precision: str
     episodes: List[AnimeNewsNetworkEpisode]
+    cast: List[AnimeNewsNetworkCastMember]
 
     # this is not a json
     def __init__(self, el: ET.Element):
@@ -47,11 +69,14 @@ class AnimeNewsNetworkEncyclopediaEntry:
         self.id = int(el.attrib["id"])
         self.precision = el.attrib["precision"]
         self.episodes = []
+        self.cast = []
         for info_element in el.iter("info"):
             # Extract the pictures
             pass
         for episode_element in el.iter("episode"):
             self.episodes.append(AnimeNewsNetworkEpisode(episode_element))
+        for cast_element in el.iter("cast"):
+            self.cast.append(AnimeNewsNetworkCastMember(cast_element))
 
     def get_episode(self, episode_num) -> Optional[AnimeNewsNetworkEpisode]:
         return next((ep for ep in self.episodes if ep.number == episode_num), None)

@@ -18,6 +18,7 @@ class MyAnimeListPicture(DataClassJsonMixin):
     medium: str
     large: Optional[str]
 
+    @property
     def url(self) -> str:
         return self.large or self.medium
 
@@ -72,6 +73,7 @@ class MyAnimeListAnime(DataClassJsonMixin):
     mean: Optional[float] = 0.0
     genres: Optional[List[MyAnimeListGenre]] = None
     num_episodes: Optional[int] = 0
+    num_scoring_users: Optional[int] = 0
     rating: Optional[str] = None
     status: Optional[str] = None
     studios: Optional[List[MyAnimeListStudio]] = None
@@ -185,6 +187,7 @@ class MyAnimeList:
             "mean",
             "genres",
             "num_episodes",
+            "num_scoring_users",
             "rating",
             "status",
             "studios",

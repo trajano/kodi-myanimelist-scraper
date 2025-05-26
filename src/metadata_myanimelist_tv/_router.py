@@ -52,30 +52,23 @@ def getdetails(*, plugin_handle: int, settings: AddOnSettings, url: str):
     anime = mal.get_anime_details(anime_id)
     ann = AnimeNewsNetworkEncyclopedia()
     ann_anime = ann.get_anime(anime.all_titles)
+    if ann_anime is None:
+        xbmc.log(
+            f"Unable to determine anime from Anime News Network {anime.all_titles}.  No episode details will be available",
+            xbmc.LOGWARNING,
+        )
     liz = xbmcgui.ListItem(anime.title, offscreen=True)
     tags = liz.getVideoInfoTag()
     tags.setTitle(anime.title)
     tags.setOriginalTitle(anime.original_title)
     # tags.setSortTitle("2")
     # tags.setUserRating(anime.mean)
-    tags.setPlotOutline(anime.synopsis)
-    if ann_anime is None:
-        xbmc.log(
-            f"Unable to determine anime from Anime News Network {anime.all_titles}.  No episode details will be available",
-            xbmc.LOGWARNING,
-        )
-        tags.setEpisodeGuide(f"{url}/episodes?count={anime.num_episodes}")
-        tags.setUniqueIDs({"myanimelist": str(anime_id)}, defaultuniqueid="myanimelist")
-    else:
-        tags.setEpisodeGuide(
-            f"animenewsnetwork:/anime/{ann_anime.id}?count={anime.num_episodes}"
-        )
-        tags.setUniqueIDs(
-            {"myanimelist": str(anime_id), "animenewsnetwork": str(ann_anime.id)},
-            defaultuniqueid="myanimelist",
-        )
+    tags.setPlot(anime.synopsis)
+    if anime.background:
+        tags.setTagline(anime.background)
+    tags.setEpisodeGuide(f"{url}/episodes?count={anime.num_episodes}")
+    tags.setUniqueIDs({"myanimelist": str(anime_id)}, defaultuniqueid="myanimelist")
 
-    # tags.setPlot("Plot yo")
     # tags.setTagLine("Tag yo")
     # tags.setDuration(110)
     tags.setMpaa(anime.mpaa_rating)
@@ -91,34 +84,66 @@ def getdetails(*, plugin_handle: int, settings: AddOnSettings, url: str):
     tags.setDateAdded(date.today().isoformat())
     if anime.start_date is not None:
         tags.setPremiered(anime.start_date.isoformat())
+
+    # tags.setFirstAired("2007-01-01")ate.isoformat())
     # tags.setFirstAired("2007-01-01")
     tags.setTvShowStatus(anime.airing_status)
     # tags.setTagLine("Family / Mom <3")
-    tags.setRatings({"myanimelist": (anime.mean, 1000)}, defaultrating="myanimelist")
+    tags.setRatings(
+        {"myanimelist": (anime.mean, anime.num_scoring_users)},
+        defaultrating="myanimelist",
+    )
     # tags.setRatings({"imdb": (9, 100000), "tvdb": (8.9, 1000)}, defaultrating="imdb")
-    tags.addSeason(1, "Beautiful")
-    tags.addSeason(2, "Sun")
-    tags.setCast(
-        [
-            xbmc.Actor(
-                "spiff", "himself", order=2, thumbnail="/home/akva/Pictures/fish.jpg"
-            ),
-            xbmc.Actor(
-                "monkey", "orange", order=1, thumbnail="/home/akva/Pictures/coffee.jpg"
-            ),
-        ]
+    # tags.addSeason(1, "Beautiful")
+    # tags.addSeason(2, "Sun")
+    # tags.setCast(
+    #     [
+    #         xbmc.Actor(
+    #             "spiff", "himself", order=2, thumbnail="/home/akva/Pictures/fish.jpg"
+    #         ),
+    #         xbmc.Actor(
+    #             "monkey", "orange", order=1, thumbnail="/home/akva/Pictures/coffee.jpg"
+    #         ),
+    #     ]
+    # )
+    tags.addAvailableArtwork(
+        anime.main_picture.url, arttype="poster", preview=anime.main_picture.medium
     )
-    tags.addAvailableArtwork("DefaultBackFanart.png", "banner")
-    tags.addAvailableArtwork("/home/akva/Pictures/hawaii-shirt.png", "poster")
-    liz.setAvailableFanart(
-        [
-            {"image": "DefaultBackFanart.png", "preview": "DefaultBackFanart.png"},
-            {
-                "image": "/home/akva/Pictures/hawaii-shirt.png",
-                "preview": "/home/akva/Pictures/hawaii-shirt.png",
-            },
-        ]
-    )
+    if anime.pictures is not None:
+        for picture in anime.pictures:
+            tags.addAvailableArtwork(
+                picture.url, arttype="poster", preview=anime.main_picture.medium
+            )
+    # tags.addAvailableArtwork("DefaultBackFanart.png", "banner")
+    # tags.addAvailableArtwork("/home/akva/Pictures/hawaii-shirt.png", "poster")
+    # liz.setAvailableFanart(
+    #     [
+    #         {"image": "DefaultBackFanart.png", "preview": "DefaultBackFanart.png"},
+    #         {
+    #             "image": "/home/akva/Pictures/hawaii-shirt.png",
+    #             "preview": "/home/akva/Pictures/hawaii-shirt.png",
+    #         },
+    #     ]
+    # )
+    if ann_anime is not None:
+        tags.setEpisodeGuide(
+            f"animenewsnetwork:/anime/{ann_anime.id}?count={anime.num_episodes}"
+        )
+        tags.setUniqueIDs(
+            {"myanimelist": str(anime_id), "animenewsnetwork": str(ann_anime.id)},
+            defaultuniqueid="myanimelist",
+        )
+        tags.setCast(
+            [
+                xbmc.Actor(
+                    castmember.person,
+                    f"{castmember.role} ({castmember.lang})",
+                    order=castmember.order,
+                )
+                for castmember in ann_anime.cast
+            ]
+        )
+
     xbmcplugin.setResolvedUrl(handle=plugin_handle, succeeded=True, listitem=liz)
 
 
@@ -215,6 +240,19 @@ def nfourl(*, plugin_handle: int, settings: AddOnSettings, nfo: str):
     pass
 
 
+def getartwork(*, plugin_handle: int, settings: AddOnSettings, id: str):
+    liz = xbmcgui.ListItem(f"artwork {id}", offscreen=True)
+    mal = MyAnimeList(settings.client_id)
+    anime = mal.get_anime_details(int(id))
+    tags = liz.getVideoInfoTag()
+    tags.setTitle("My Anime List Main Picture")
+    tags.addAvailableArtwork(
+        anime.main_picture.url, arttype="poster", preview=anime.main_picture.medium
+    )
+    xbmc.log(f"{anime.main_picture.url}", xbmc.LOGWARNING)
+    xbmcplugin.setResolvedUrl(handle=plugin_handle, succeeded=True, listitem=liz)
+
+
 def route(params: Dict[str, str], *, plugin_handle: int):
     action = params.get("action")
     if action is None:
@@ -230,4 +268,4 @@ def route(params: Dict[str, str], *, plugin_handle: int):
         xbmc.log(f"{action}: {kwargs}", xbmc.LOGWARNING)
         return func(plugin_handle=plugin_handle, settings=settings, **kwargs)
     else:
-        xbmc.log(f"unsupported action: {action}", xbmc.LOGWARNING)
+        xbmc.log(f"unsupported action: {action} {params}", xbmc.LOGWARNING)
