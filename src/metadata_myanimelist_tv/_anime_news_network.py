@@ -35,6 +35,13 @@ class AnimeNewsNetworkCastMember:
         else:
             return 3
 
+    @property
+    def role_label(self) -> str:
+        if self.lang == "JA":
+            return self.role
+        else:
+            return f"{self.role} ({self.lang})"
+
 
 @dataclass
 class AnimeNewsNetworkEpisode:
