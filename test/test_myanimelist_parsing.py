@@ -1,4 +1,4 @@
-from metadata_myanimelist_tv.myanimelist import (
+from metadata_myanimelist_tv._myanimelist import (
     MyAnimeListAnime,
     MyAnimeListAlternativeTitles,
     MyAnimeListPicture,

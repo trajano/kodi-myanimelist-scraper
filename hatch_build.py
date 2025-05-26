@@ -2,16 +2,23 @@ from hatchling.builders.hooks.plugin.interface import BuildHookInterface
 import os
 from xml.etree.ElementTree import Element, SubElement, tostring
 from xml.dom import minidom
+from typing import Dict, Any
+import time
+import markdown
+import bs4
 
 
 class CustomBuildHook(BuildHookInterface):
     def initialize(self, version, build_data):
         metadata = self.metadata.core
+        readme = bs4.BeautifulSoup(
+            markdown.markdown(metadata.readme), "html.parser"
+        ).get_text()
         addon = Element(
             "addon",
             {
                 "id": metadata.name.replace("-", "."),
-                "version": version,
+                "version": metadata.version,
                 "name": metadata.description,
                 "provider-name": metadata.authors_data.get("name", [""])[0]
                 if metadata.authors_data
@@ -50,6 +57,7 @@ class CustomBuildHook(BuildHookInterface):
             {
                 "point": "xbmc.metadata.scraper.tvshows",
                 "library": "addon.py",
+                "cachepersistence": "00:01",
             },
         )
 
@@ -60,7 +68,7 @@ class CustomBuildHook(BuildHookInterface):
         )
 
         SubElement(addon_metadata, "summary").text = metadata.description
-        SubElement(addon_metadata, "description").text = metadata.readme
+        SubElement(addon_metadata, "description").text = readme
         SubElement(addon_metadata, "platform").text = "all"
         SubElement(addon_metadata, "license").text = metadata.license_expression
 
@@ -68,3 +76,13 @@ class CustomBuildHook(BuildHookInterface):
         with open(os.path.join(self.root, "addon.xml"), "w", encoding="utf-8") as f:
             f.write(xml_str)
         print(xml_str)
+
+    def finalize(
+        self, version: str, build_data: Dict[str, Any], artifact_path: str
+    ) -> None:
+        ts = str(int(time.time()))
+        dirpath, fname = os.path.split(artifact_path)
+        name, ext = os.path.splitext(fname)
+        new_fname = f"{name}.{ts}{ext}"
+        new_path = os.path.join(dirpath, new_fname)
+        os.rename(artifact_path, new_path)
