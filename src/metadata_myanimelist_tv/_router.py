@@ -1,3 +1,4 @@
+import xml.etree.ElementTree as ET
 from datetime import date
 from typing import Dict, Optional
 import xbmc
@@ -6,7 +7,6 @@ import xbmcplugin
 from ._settings import AddOnSettings
 from ._myanimelist import MyAnimeList
 from ._anime_news_network import AnimeNewsNetworkEncyclopedia
-
 from urllib.parse import urlparse, parse_qs
 
 
@@ -240,7 +240,8 @@ def getepisodedetails(*, plugin_handle: int, settings: AddOnSettings, url: str):
 
 
 def nfourl(*, plugin_handle: int, settings: AddOnSettings, nfo: str):
-    pass
+    nfo_xml = ET.fromstring(nfo)
+    xbmc.log(f"{nfo_xml}", level=xbmc.LOGWARNING)
 
 
 def getartwork(*, plugin_handle: int, settings: AddOnSettings, id: str):
@@ -260,6 +261,7 @@ def route(params: Dict[str, str], *, plugin_handle: int):
     action = params.get("action")
     if action is None:
         raise ValueError("action is not present in the parameters")
+    action = action.lower()
     # look up a function in this module by name
     func = globals().get(action)
     if callable(func):
