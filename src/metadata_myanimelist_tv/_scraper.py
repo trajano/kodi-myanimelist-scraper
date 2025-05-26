@@ -8,7 +8,7 @@ from ._settings import AddOnSettings
 from ._myanimelist import MyAnimeList
 from ._anime_news_network import AnimeNewsNetworkEncyclopedia
 from urllib.parse import urlparse, parse_qs
-from .protocol import TvShowScraper
+from kodi_addon.protocols import TvShowScraper
 
 
 class MyAnimeListScraper(TvShowScraper):
