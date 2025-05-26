@@ -5,6 +5,7 @@ import xbmcgui
 import xbmcplugin
 from ._settings import AddOnSettings
 from ._myanimelist import MyAnimeList
+from ._anime_news_network import AnimeNewsNetworkEncyclopedia
 
 from urllib.parse import urlparse
 
@@ -49,13 +50,28 @@ def getdetails(*, plugin_handle: int, settings: AddOnSettings, url: str):
     parsed = urlparse(url)
     anime_id = int(parsed.path.rsplit("/", 1)[-1])
     anime = mal.get_anime_details(anime_id)
+    ann = AnimeNewsNetworkEncyclopedia()
+    ann_anime = ann.get_anime(anime.all_titles)
     liz = xbmcgui.ListItem(anime.title, offscreen=True)
     tags = liz.getVideoInfoTag()
     tags.setTitle(anime.title)
     tags.setOriginalTitle(anime.original_title)
     # tags.setSortTitle("2")
-    tags.setUserRating(anime.mean)
-    tags.setPlotOutline(anime.studios)
+    # tags.setUserRating(anime.mean)
+    tags.setPlotOutline(anime.synopsis)
+    if ann_anime is None:
+        xbmc.log(
+            f"Unable to determine anime from Anime News Network {anime.all_titles}.  No episode data will be available",
+            xbmc.LOGWARNING,
+        )
+        tags.setUniqueIDs({"myanimelist": str(anime_id)}, defaultuniqueid="myanimelist")
+    else:
+        tags.setEpisodeGuide(f"{url}/episodes/{ann_anime.id}")
+        tags.setUniqueIDs(
+            {"myanimelist": str(anime_id), "animenewsnetwork": str(ann_anime.id)},
+            defaultuniqueid="myanimelist",
+        )
+
     # tags.setPlot("Plot yo")
     # tags.setTagLine("Tag yo")
     # tags.setDuration(110)
@@ -74,11 +90,9 @@ def getdetails(*, plugin_handle: int, settings: AddOnSettings, url: str):
         tags.setPremiered(anime.start_date.isoformat())
     # tags.setFirstAired("2007-01-01")
     tags.setTvShowStatus(anime.airing_status)
-    # tags.setEpisodeGuide('/path/to/show/guide')
-    tags.setEpisodeGuide(f"{url}/episodes")
     # tags.setTagLine("Family / Mom <3")
+    tags.setRatings({"myanimelist": (anime.mean, 1000)}, defaultrating="myanimelist")
     # tags.setRatings({"imdb": (9, 100000), "tvdb": (8.9, 1000)}, defaultrating="imdb")
-    tags.setUniqueIDs({"myanimelist": anime_id}, defaultuniqueid="myanimelist")
     tags.addSeason(1, "Beautiful")
     tags.addSeason(2, "Sun")
     tags.setCast(
@@ -106,7 +120,30 @@ def getdetails(*, plugin_handle: int, settings: AddOnSettings, url: str):
 
 
 def getepisodelist(*, plugin_handle: int, settings: AddOnSettings, url: str):
-    pass
+    parsed = urlparse(url)
+    anime_id = int(parsed.path.rsplit("/", 1)[-1])
+    ann = AnimeNewsNetworkEncyclopedia()
+    anime = ann.get_anime_by_id(anime_id)
+    if anime is None:
+        xbmc.log(
+            f"Unable to determine anime from Anime News Network id={anime_id}",
+            xbmc.LOGERROR,
+        )
+        return
+    for episode in anime.episodes:
+        liz = xbmcgui.ListItem(episode.title, offscreen=True)
+        tags = liz.getVideoInfoTag()
+        tags.setTitle(episode.title)
+        tags.setSeason(1)
+        tags.setEpisode(episode.number)
+        # tags.setFirstAired('2015-01-01')
+        # tags.addAvailableArtwork('/path/to/episode1', 'banner')
+        xbmcplugin.addDirectoryItem(
+            handle=plugin_handle,
+            url=f"ann:/anime/{anime_id}/episode/{episode.number}",
+            listitem=liz,
+            isFolder=False,
+        )
 
 
 def getepisodedetails(*, plugin_handle: int, settings: AddOnSettings, url: str):
