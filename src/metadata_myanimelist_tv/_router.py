@@ -7,7 +7,7 @@ from ._settings import AddOnSettings
 from ._myanimelist import MyAnimeList
 from ._anime_news_network import AnimeNewsNetworkEncyclopedia
 
-from urllib.parse import urlparse
+from urllib.parse import urlparse, parse_qs
 
 
 def find(
@@ -61,12 +61,15 @@ def getdetails(*, plugin_handle: int, settings: AddOnSettings, url: str):
     tags.setPlotOutline(anime.synopsis)
     if ann_anime is None:
         xbmc.log(
-            f"Unable to determine anime from Anime News Network {anime.all_titles}.  No episode data will be available",
+            f"Unable to determine anime from Anime News Network {anime.all_titles}.  No episode details will be available",
             xbmc.LOGWARNING,
         )
+        tags.setEpisodeGuide(f"{url}/episodes?count={anime.num_episodes}")
         tags.setUniqueIDs({"myanimelist": str(anime_id)}, defaultuniqueid="myanimelist")
     else:
-        tags.setEpisodeGuide(f"{url}/episodes/{ann_anime.id}")
+        tags.setEpisodeGuide(
+            f"animenewsnetwork:/anime/{ann_anime.id}?count={anime.num_episodes}"
+        )
         tags.setUniqueIDs(
             {"myanimelist": str(anime_id), "animenewsnetwork": str(ann_anime.id)},
             defaultuniqueid="myanimelist",
@@ -121,29 +124,60 @@ def getdetails(*, plugin_handle: int, settings: AddOnSettings, url: str):
 
 def getepisodelist(*, plugin_handle: int, settings: AddOnSettings, url: str):
     parsed = urlparse(url)
-    anime_id = int(parsed.path.rsplit("/", 1)[-1])
-    ann = AnimeNewsNetworkEncyclopedia()
-    anime = ann.get_anime_by_id(anime_id)
-    if anime is None:
-        xbmc.log(
-            f"Unable to determine anime from Anime News Network id={anime_id}",
-            xbmc.LOGERROR,
-        )
-        return
-    for episode in anime.episodes:
-        liz = xbmcgui.ListItem(episode.title, offscreen=True)
-        tags = liz.getVideoInfoTag()
-        tags.setTitle(episode.title)
-        tags.setSeason(1)
-        tags.setEpisode(episode.number)
-        # tags.setFirstAired('2015-01-01')
-        # tags.addAvailableArtwork('/path/to/episode1', 'banner')
-        xbmcplugin.addDirectoryItem(
-            handle=plugin_handle,
-            url=f"ann:/anime/{anime_id}/episode/{episode.number}",
-            listitem=liz,
-            isFolder=False,
-        )
+    if parsed.scheme == "myanimelist":
+        segments = parsed.path.strip("/").split("/")
+        anime_id = int(segments[1])
+        episode_count = int(parse_qs(parsed.query).get("count", [0])[0])
+        for i in range(1, episode_count + 1):
+            liz = xbmcgui.ListItem(f"Episode {i}", offscreen=True)
+            tags = liz.getVideoInfoTag()
+            tags.setTitle(f"Episode {i}")
+            tags.setSeason(1)
+            tags.setEpisode(i)
+            xbmcplugin.addDirectoryItem(
+                handle=plugin_handle,
+                url=f"myanimelist:/anime/{anime_id}/episode/{i}",
+                listitem=liz,
+                isFolder=False,
+            )
+
+    elif parsed.scheme == "animenewsnetwork":
+        anime_id = int(parsed.path.rsplit("/", 1)[-1])
+        ann = AnimeNewsNetworkEncyclopedia()
+        anime = ann.get_anime_by_id(anime_id)
+        episode_count = int(parse_qs(parsed.query).get("count", [0])[0])
+        if anime is None:
+            xbmc.log(
+                f"Unable to determine anime from Anime News Network id={anime_id}",
+                xbmc.LOGERROR,
+            )
+            return
+        for episode in anime.episodes:
+            liz = xbmcgui.ListItem(episode.title, offscreen=True)
+            tags = liz.getVideoInfoTag()
+            tags.setTitle(episode.title)
+            tags.setSeason(1)
+            tags.setEpisode(episode.number)
+            # tags.setFirstAired('2015-01-01')
+            # tags.addAvailableArtwork('/path/to/episode1', 'banner')
+            xbmcplugin.addDirectoryItem(
+                handle=plugin_handle,
+                url=f"ann:/anime/{anime_id}/episode/{episode.number}",
+                listitem=liz,
+                isFolder=False,
+            )
+        for i in range(len(anime.episodes), episode_count + 1):
+            liz = xbmcgui.ListItem(f"Episode {i}", offscreen=True)
+            tags = liz.getVideoInfoTag()
+            tags.setTitle(f"Episode {i}")
+            tags.setSeason(1)
+            tags.setEpisode(i)
+            xbmcplugin.addDirectoryItem(
+                handle=plugin_handle,
+                url=f"myanimelist:/anime/{anime_id}/episode/{i}",
+                listitem=liz,
+                isFolder=False,
+            )
 
 
 def getepisodedetails(*, plugin_handle: int, settings: AddOnSettings, url: str):

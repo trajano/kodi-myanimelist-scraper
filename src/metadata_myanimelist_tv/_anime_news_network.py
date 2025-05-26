@@ -35,6 +35,7 @@ class AnimeNewsNetworkEpisode:
 class AnimeNewsNetworkEncyclopediaEntry:
     id: int
     name: str
+    type: str
     precision: str
     episodes: List[AnimeNewsNetworkEpisode]
 
@@ -42,6 +43,7 @@ class AnimeNewsNetworkEncyclopediaEntry:
     def __init__(self, el: ET.Element):
         self.el = el
         self.name = el.attrib["name"]
+        self.type = el.attrib["type"]
         self.id = int(el.attrib["id"])
         self.precision = el.attrib["precision"]
         self.episodes = []
