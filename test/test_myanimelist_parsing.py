@@ -20,10 +20,10 @@ def test_parse_alternative_titles():
     alternative_titles = MyAnimeListAlternativeTitles.from_json(
         shokugeki_alternative_titles
     )
-    assert "Shokugeki no Soma" in alternative_titles.all_titles()
-    assert "Food Wars: Shokugeki no Soma" in alternative_titles.all_titles()
-    assert "Food Wars! Shokugeki no Soma" in alternative_titles.all_titles()
-    assert "食戟のソーマ" in alternative_titles.all_titles()
+    assert "Shokugeki no Soma" in alternative_titles.all_titles
+    assert "Food Wars: Shokugeki no Soma" in alternative_titles.all_titles
+    assert "Food Wars! Shokugeki no Soma" in alternative_titles.all_titles
+    assert "食戟のソーマ" in alternative_titles.all_titles
 
 
 def test_parse_picture():
@@ -110,10 +110,10 @@ def test_parse_shokugeki():
 }
 """
     anime = MyAnimeListAnime.from_json(shokugeki)
-    assert "Shokugeki no Souma" in anime.all_titles()
-    assert "Shokugeki no Soma" in anime.all_titles()
-    assert "Food Wars: Shokugeki no Soma" in anime.all_titles()
-    assert "Food Wars! Shokugeki no Soma" in anime.all_titles()
-    assert "食戟のソーマ" in anime.all_titles()
+    assert "Shokugeki no Souma" in anime.all_titles
+    assert "Shokugeki no Soma" in anime.all_titles
+    assert "Food Wars: Shokugeki no Soma" in anime.all_titles
+    assert "Food Wars! Shokugeki no Soma" in anime.all_titles
+    assert "食戟のソーマ" in anime.all_titles
 
     assert isinstance(anime.start_date, date)

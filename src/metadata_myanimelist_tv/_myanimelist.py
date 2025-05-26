@@ -44,6 +44,7 @@ class MyAnimeListAlternativeTitles(DataClassJsonMixin):
     en: Optional[str] = None
     ja: Optional[str] = None
 
+    @property
     def all_titles(self) -> Set[str]:
         result: Set[str] = set(self.synonyms)
 
@@ -91,10 +92,11 @@ class MyAnimeListAnime(DataClassJsonMixin):
         ),
     )
 
+    @property
     def all_titles(self) -> Set[str]:
         # gather alt titles if present, then add the main title
         alt_set = (
-            self.alternative_titles.all_titles() if self.alternative_titles else set()
+            self.alternative_titles.all_titles if self.alternative_titles else set()
         )
         return alt_set | {self.title}
 
