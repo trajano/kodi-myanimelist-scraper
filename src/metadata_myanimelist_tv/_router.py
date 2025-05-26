@@ -1,8 +1,12 @@
+from datetime import date
 from typing import Dict, Optional
 import xbmc
 import xbmcgui
 import xbmcplugin
 from ._settings import AddOnSettings
+from ._myanimelist import MyAnimeList
+
+from urllib.parse import urlparse
 
 
 def find(
@@ -23,17 +27,16 @@ def find(
 
     thumb (optional): passed via setArtwork() of xbmcgui.ListItem class instance method. This should be a URL of a TV show poster, for example.
     """
-    liz = xbmcgui.ListItem(title, "second Title", offscreen=True)
-    # The URL here is a "virtual" but does not appear to have any bearing to the real file location. Instead it
-    # gets passed to getdetails
-
-    # This would be the
-    xbmcplugin.addDirectoryItem(
-        handle=plugin_handle,
-        url="myanimelist:/anime/30230",
-        listitem=liz,
-        isFolder=True,
-    )
+    mal = MyAnimeList(settings.client_id)
+    result = mal.find_anime(title)
+    for anime in [item.node for item in result.data]:
+        liz = xbmcgui.ListItem(anime.title, "", offscreen=True)
+        xbmcplugin.addDirectoryItem(
+            handle=plugin_handle,
+            url=f"myanimelist:/anime/{anime.id}",
+            listitem=liz,
+            isFolder=True,
+        )
 
 
 def getdetails(*, plugin_handle: int, settings: AddOnSettings, url: str):
@@ -42,31 +45,40 @@ def getdetails(*, plugin_handle: int, settings: AddOnSettings, url: str):
     The getdetails action must pass a single xbmcgui.ListItem via xbmcplugin.setResolvedUrl() function. This action receives url query parameter from the previous stages and should set as much information to the xbmcgui.ListItem instance as possible using appropriate methods. One of the necessary properties that are set via ListItem.setInfo method is episodeguide. This should be some unique string that can be used to retrieve the list of TV show episoded with all the necessary info.
     """
     # fetch the details of the anime
-    liz = xbmcgui.ListItem("Demo show 1", offscreen=True)
+    mal = MyAnimeList(settings.client_id)
+    parsed = urlparse(url)
+    anime_id = int(parsed.path.rsplit("/", 1)[-1])
+    anime = mal.get_anime_details(anime_id)
+    liz = xbmcgui.ListItem(anime.title, offscreen=True)
     tags = liz.getVideoInfoTag()
-    tags.setTitle("Demo show 1")
-    tags.setOriginalTitle("Demo shåvv 1")
-    tags.setSortTitle("2")
-    tags.setUserRating(5)
-    tags.setPlotOutline("Outline yo")
-    tags.setPlot("Plot yo")
-    tags.setTagLine("Tag yo")
-    tags.setDuration(110)
-    tags.setMpaa("T")
-    tags.setTrailer("/home/akva/fluffy/bunnies.mkv")
-    tags.setGenres(["Action", "Comedy"])
+    tags.setTitle(anime.title)
+    tags.setOriginalTitle(anime.original_title)
+    # tags.setSortTitle("2")
+    tags.setUserRating(anime.mean)
+    tags.setPlotOutline(anime.studios)
+    # tags.setPlot("Plot yo")
+    # tags.setTagLine("Tag yo")
+    # tags.setDuration(110)
+    tags.setMpaa(anime.mpaa_rating)
+    # tags.setTrailer("/home/akva/fluffy/bunnies.mkv")
+
+    if anime.genres is not None:
+        tags.setGenres([genre.name for genre in anime.genres])
     tags.setWriters(["None", "Want", "To Admit It"])
     tags.setDirectors(["Director 1", "Director 2"])
-    tags.setStudios(["Studio1", "Studio2"])
-    tags.setDateAdded("2016-01-01")
-    tags.setPremiered("2015-01-01")
-    tags.setFirstAired("2007-01-01")
-    tags.setTvShowStatus("Cancelled")
+    if anime.studios is not None:
+        tags.setStudios([studio.name for studio in anime.studios])
+    # tags.setStudios(["Studio1", "Studio2"])
+    tags.setDateAdded(date.today().isoformat())
+    if anime.start_date is not None:
+        tags.setPremiered(anime.start_date.isoformat())
+    # tags.setFirstAired("2007-01-01")
+    tags.setTvShowStatus(anime.airing_status)
     # tags.setEpisodeGuide('/path/to/show/guide')
     tags.setEpisodeGuide(f"{url}/episodes")
-    tags.setTagLine("Family / Mom <3")
-    tags.setRatings({"imdb": (9, 100000), "tvdb": (8.9, 1000)}, defaultrating="imdb")
-    tags.setUniqueIDs({"imdb": "tt8938399", "tmdb": "9837493"}, defaultuniqueid="tvdb")
+    # tags.setTagLine("Family / Mom <3")
+    # tags.setRatings({"imdb": (9, 100000), "tvdb": (8.9, 1000)}, defaultrating="imdb")
+    tags.setUniqueIDs({"myanimelist": anime_id}, defaultuniqueid="myanimelist")
     tags.addSeason(1, "Beautiful")
     tags.addSeason(2, "Sun")
     tags.setCast(

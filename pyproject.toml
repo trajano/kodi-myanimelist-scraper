@@ -7,6 +7,7 @@ readme = "README.md"
 # sys.version: 3.8.15 (default, Oct 17 2022, 02:39:57) [MSC v.1929 64 bit (AMD64)]
 requires-python = ">=3.8.15,<3.9"
 dependencies = [
+    "chardet>=5.2.0",
     "cloudscraper>=1.2.71",
  "dataclasses-json>=0.6.7",
  "pillow",
@@ -18,6 +19,7 @@ package = true
 
 [dependency-groups]
 dev = [
+    "dotenv>=0.9.9",
     "hatch>=1.14.1",
     "kodistubs>=21.0.0",
     "poethepoet",
@@ -29,7 +31,13 @@ dev = [
 
 
 [build-system]
-requires = ["hatchling", "hatch-zipped-directory", "strip-hints", "markdown", "beautifulsoup4"]
+requires = [
+    "hatchling",
+    "hatch-zipped-directory",
+    "strip-hints",
+    "markdown",
+    "beautifulsoup4",
+]
 #requires    = ["hatchling"]
 build-backend = "hatchling.build"
 
@@ -41,26 +49,25 @@ install-name = "metadata.myanimelist.tv"
 # Include everything in the project root
 #only-include=["src/"]
 sources = ["src/"]
-exclude=["uv.lock","hatch_build.py","pyproject.toml",".??*","test"]
-artifacts =[
-    "addon.xml"
-]
+exclude = ["uv.lock", "hatch_build.py", "pyproject.toml", ".??*", "test"]
+artifacts = ["addon.xml"]
 [tool.hatch.build.targets.zipped-directory.force-include]
-".venv/Lib/site-packages/dataclasses_json"     = "resources/lib/dataclasses_json"
-".venv/Lib/site-packages/marshmallow"          = "resources/lib/marshmallow"
-".venv/Lib/site-packages/certifi"              = "resources/lib/certifi"
-".venv/Lib/site-packages/charset_normalizer"   = "resources/lib/charset_normalizer"
-".venv/Lib/site-packages/cloudscraper"         = "resources/lib/cloudscraper"
-".venv/Lib/site-packages/idna"                 = "resources/lib/idna"
-".venv/Lib/site-packages/mypy_extensions.py"      = "resources/lib/mypy_extensions.py"
-".venv/Lib/site-packages/packaging"            = "resources/lib/packaging"
-".venv/Lib/site-packages/PIL"                  = "resources/lib/PIL"
-".venv/Lib/site-packages/pyparsing"            = "resources/lib/pyparsing"
-".venv/Lib/site-packages/requests"             = "resources/lib/requests"
-".venv/Lib/site-packages/requests_toolbelt"    = "resources/lib/requests_toolbelt"
-".venv/Lib/site-packages/typing_extensions.py"    = "resources/lib/typing_extensions.py"
-".venv/Lib/site-packages/typing_inspect.py"       = "resources/lib/typing_inspect.py"
-".venv/Lib/site-packages/urllib3"              = "resources/lib/urllib3"
+".venv/Lib/site-packages/dataclasses_json" = "resources/lib/dataclasses_json"
+".venv/Lib/site-packages/marshmallow" = "resources/lib/marshmallow"
+".venv/Lib/site-packages/certifi" = "resources/lib/certifi"
+".venv/Lib/site-packages/chardet" = "resources/lib/chardet"
+".venv/Lib/site-packages/charset_normalizer" = "resources/lib/charset_normalizer"
+".venv/Lib/site-packages/cloudscraper" = "resources/lib/cloudscraper"
+".venv/Lib/site-packages/idna" = "resources/lib/idna"
+".venv/Lib/site-packages/mypy_extensions.py" = "resources/lib/mypy_extensions.py"
+".venv/Lib/site-packages/packaging" = "resources/lib/packaging"
+".venv/Lib/site-packages/PIL" = "resources/lib/PIL"
+".venv/Lib/site-packages/pyparsing" = "resources/lib/pyparsing"
+".venv/Lib/site-packages/requests" = "resources/lib/requests"
+".venv/Lib/site-packages/requests_toolbelt" = "resources/lib/requests_toolbelt"
+".venv/Lib/site-packages/typing_extensions.py" = "resources/lib/typing_extensions.py"
+".venv/Lib/site-packages/typing_inspect.py" = "resources/lib/typing_inspect.py"
+".venv/Lib/site-packages/urllib3" = "resources/lib/urllib3"
 
 [tool.hatch.build.hooks.custom]
 

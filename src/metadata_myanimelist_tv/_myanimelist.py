@@ -41,12 +41,23 @@ class MyAnimeListStudio(DataClassJsonMixin):
 class MyAnimeListAlternativeTitles(DataClassJsonMixin):
     synonyms: List[str]
     titles: CatchAll
+    en: Optional[str] = None
+    ja: Optional[str] = None
 
     def all_titles(self) -> Set[str]:
+        result: Set[str] = set(self.synonyms)
+
         if isinstance(self.titles, dict):
-            return set(self.synonyms) | set(self.titles.values())
-        else:
-            return set(self.synonyms)
+            # add all values from the titles dict
+            result |= set(self.titles.values())
+
+        # add the optional en/ja if present
+        if self.en:
+            result.add(self.en)
+        if self.ja:
+            result.add(self.ja)
+
+        return result
 
 
 @dataclass_json
@@ -55,16 +66,17 @@ class MyAnimeListAnime(DataClassJsonMixin):
     id: int
     title: str
     main_picture: MyAnimeListPicture
-    synopsis: Optional[str]
+    synopsis: Optional[str] = None
 
-    mean: Optional[float]
-    genres: Optional[List[MyAnimeListGenre]]
-    num_episodes: Optional[int]
-    rating: Optional[str]
-    studios: Optional[List[MyAnimeListStudio]]
-    pictures: Optional[List[MyAnimeListPicture]]
-    background: Optional[str]
-    alternative_titles: Optional[MyAnimeListAlternativeTitles]
+    mean: Optional[float] = 0.0
+    genres: Optional[List[MyAnimeListGenre]] = None
+    num_episodes: Optional[int] = 0
+    rating: Optional[str] = None
+    status: Optional[str] = None
+    studios: Optional[List[MyAnimeListStudio]] = None
+    pictures: Optional[List[MyAnimeListPicture]] = None
+    background: Optional[str] = ""
+    alternative_titles: Optional[MyAnimeListAlternativeTitles] = None
 
     start_date: Optional[date] = field(
         default=None,
@@ -86,13 +98,70 @@ class MyAnimeListAnime(DataClassJsonMixin):
         )
         return alt_set | {self.title}
 
+    @property
+    def original_title(self) -> str:
+        if self.alternative_titles is not None:
+            if self.alternative_titles.ja is not None:
+                return self.alternative_titles.ja
+            if self.alternative_titles.en is not None:
+                return self.alternative_titles.en
+        return self.title
+
+    @property
+    def mpaa_rating(self) -> Optional[str]:
+        if self.rating == "g":
+            return "G"
+        if self.rating == "pg":
+            return "PG"
+        if self.rating == "pg_13":
+            return "PG-13"
+        if self.rating == "r":
+            return "R"
+        if self.rating == "r+":
+            return "R"
+        if self.rating == "rx":
+            return "NC-17"
+        return None
+
+    @property
+    def airing_status(self) -> Optional[str]:
+        if self.status == "finished_airing":
+            return "Finished"
+        if self.status == "currently_airing":
+            return "Airing"
+        if self.status == "not_yet_aired":
+            return "Not yet aired"
+        return None
+
+
+@dataclass_json
+@dataclass
+class MyAnimeListQueryResultNode(DataClassJsonMixin):
+    node: MyAnimeListAnime
+
+
+@dataclass_json
+@dataclass
+class MyAnimeListQueryPaging(DataClassJsonMixin):
+    prev: Optional[str] = None
+    next: Optional[str] = None
+
+
+@dataclass_json
+@dataclass
+class MyAnimeListQueryResult(DataClassJsonMixin):
+    data: List[MyAnimeListQueryResultNode]
+    paging: MyAnimeListQueryPaging
+
 
 class MyAnimeList:
     def __init__(self, client_id: str) -> None:
         self.client_id = client_id
 
-    def find_anime(self, query: str, *, limit=100, offset=0, nsfw=True):
-        get(
+    def find_anime(
+        self, query: str, *, limit=100, offset=0, nsfw=True
+    ) -> MyAnimeListQueryResult:
+        resp = get(
             "https://api.myanimelist.net/v2/anime",
             {
                 "q": query,
@@ -100,7 +169,9 @@ class MyAnimeList:
                 limit: limit,
                 offset: offset,
             },
+            headers={"X-MAL-CLIENT-ID": self.client_id},
         )
+        return MyAnimeListQueryResult.from_json(resp.content)
 
     def get_anime_details(
         self,
@@ -113,6 +184,7 @@ class MyAnimeList:
             "genres",
             "num_episodes",
             "rating",
+            "status",
             "studios",
             "pictures",
             "background",
@@ -120,4 +192,9 @@ class MyAnimeList:
         ],
         nsfw=True,
     ):
-        pass
+        resp = get(
+            f"https://api.myanimelist.net/v2/anime/{id}",
+            {"nsfw": "true" if nsfw else "false", "fields": ",".join(fields)},
+            headers={"X-MAL-CLIENT-ID": self.client_id},
+        )
+        return MyAnimeListAnime.from_json(resp.content)

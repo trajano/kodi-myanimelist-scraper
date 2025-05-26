@@ -7,11 +7,11 @@ the error: attempted relative import with no known parent package
 
 import os
 import sys
-from metadata_myanimelist_tv import plugin_main
+import importlib
 
 base = os.path.dirname(__file__)
 sys.path.insert(0, os.path.join(base, "resources", "lib"))
 
-
 if __name__ == "__main__":
-    plugin_main()
+    pkg = importlib.import_module("metadata_myanimelist_tv")
+    pkg.plugin_main()

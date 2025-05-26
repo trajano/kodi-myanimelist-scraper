@@ -75,11 +75,12 @@ class CustomBuildHook(BuildHookInterface):
         xml_str = minidom.parseString(tostring(addon)).toprettyxml(indent="  ")
         with open(os.path.join(self.root, "addon.xml"), "w", encoding="utf-8") as f:
             f.write(xml_str)
-        print(xml_str)
 
     def finalize(
         self, version: str, build_data: Dict[str, Any], artifact_path: str
     ) -> None:
+        if version != "standard":
+            return
         ts = str(int(time.time()))
         dirpath, fname = os.path.split(artifact_path)
         name, ext = os.path.splitext(fname)
