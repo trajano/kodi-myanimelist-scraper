@@ -4,7 +4,8 @@ version = "0.1.0"
 description = "MyAnimeList TV Scraper"
 readme = "README.md"
 # https://kodi.wiki/view/Python_libraries
-requires-python = ">=3.8,<3.9"
+# sys.version: 3.8.15 (default, Oct 17 2022, 02:39:57) [MSC v.1929 64 bit (AMD64)]
+requires-python = ">=3.8.15,<3.9"
 dependencies = [
     "cloudscraper>=1.2.71",
  "dataclasses-json>=0.6.7",

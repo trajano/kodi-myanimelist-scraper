@@ -1,3 +1,3 @@
-from .router import route
+from ._main import plugin_main
 
-__all__ = ["route"]
+__all__ = ["plugin_main"]

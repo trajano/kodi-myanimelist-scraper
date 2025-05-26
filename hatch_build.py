@@ -49,7 +49,7 @@ class CustomBuildHook(BuildHookInterface):
             "extension",
             {
                 "point": "xbmc.metadata.scraper.tvshows",
-                "library": "metadata_myanimelist_tv/addon.py",
+                "library": "addon.py",
             },
         )
 
