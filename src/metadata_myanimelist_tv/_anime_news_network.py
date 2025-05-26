@@ -53,6 +53,9 @@ class AnimeNewsNetworkEncyclopediaEntry:
         for episode_element in el.iter("episode"):
             self.episodes.append(AnimeNewsNetworkEpisode(episode_element))
 
+    def get_episode(self, episode_num) -> Optional[AnimeNewsNetworkEpisode]:
+        return next((ep for ep in self.episodes if ep.number == episode_num), None)
+
 
 class AnimeNewsNetworkEncyclopedia:
     def get_anime(

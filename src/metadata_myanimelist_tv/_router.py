@@ -162,7 +162,7 @@ def getepisodelist(*, plugin_handle: int, settings: AddOnSettings, url: str):
             # tags.addAvailableArtwork('/path/to/episode1', 'banner')
             xbmcplugin.addDirectoryItem(
                 handle=plugin_handle,
-                url=f"ann:/anime/{anime_id}/episode/{episode.number}",
+                url=f"animenewsnetwork:/anime/{anime_id}/episode/{episode.number}",
                 listitem=liz,
                 isFolder=False,
             )
@@ -181,7 +181,34 @@ def getepisodelist(*, plugin_handle: int, settings: AddOnSettings, url: str):
 
 
 def getepisodedetails(*, plugin_handle: int, settings: AddOnSettings, url: str):
-    pass
+    parsed = urlparse(url)
+    if parsed.scheme == "myanimelist":
+        episode_num = int(parsed.path.rsplit("/", 1)[-1])
+        liz = xbmcgui.ListItem(f"Episode {episode_num}", offscreen=True)
+        tags = liz.getVideoInfoTag()
+        tags.setTitle(f"Episode {episode_num}")
+        tags.setSeason(1)
+        tags.setEpisode(episode_num)
+        tags.setDateAdded(date.today().isoformat())
+        xbmcplugin.setResolvedUrl(handle=plugin_handle, succeeded=True, listitem=liz)
+    if parsed.scheme == "animenewsnetwork":
+        segments = parsed.path.strip("/").split("/")
+        anime_id = int(segments[1])
+        episode_num = int(parsed.path.rsplit("/", 1)[-1])
+        liz = xbmcgui.ListItem(f"Episode {episode_num}", offscreen=True)
+        ann = AnimeNewsNetworkEncyclopedia()
+        anime = ann.get_anime_by_id(anime_id)
+        title = f"Episode {episode_num}"
+        if anime is not None:
+            episode = anime.get_episode(episode_num)
+            if episode is not None:
+                title = episode.title
+        tags = liz.getVideoInfoTag()
+        tags.setTitle(title)
+        tags.setSeason(1)
+        tags.setEpisode(episode_num)
+        tags.setDateAdded(date.today().isoformat())
+        xbmcplugin.setResolvedUrl(handle=plugin_handle, succeeded=True, listitem=liz)
 
 
 def nfourl(*, plugin_handle: int, settings: AddOnSettings, nfo: str):
