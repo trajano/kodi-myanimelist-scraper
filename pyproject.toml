@@ -48,9 +48,11 @@ build-backend = "hatchling.build"
 install-name = "metadata.myanimelist.tv"
 # Include everything in the project root
 #only-include=["src/"]
-sources = ["src/"]
 exclude = ["uv.lock", "hatch_build.py", "pyproject.toml", ".??*", "test"]
 artifacts = ["addon.xml"]
+[tool.hatch.build.targets.zipped-directory.sources]
+"src" = "resources/lib"
+
 [tool.hatch.build.targets.zipped-directory.force-include]
 ".venv/Lib/site-packages/dataclasses_json" = "resources/lib/dataclasses_json"
 ".venv/Lib/site-packages/marshmallow" = "resources/lib/marshmallow"

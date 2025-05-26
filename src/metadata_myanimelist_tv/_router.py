@@ -10,6 +10,11 @@ from ._anime_news_network import AnimeNewsNetworkEncyclopedia
 from urllib.parse import urlparse, parse_qs
 
 
+def _clean_title(input: str) -> str:
+    input = input.replace("[SakuraCircle]", "")
+    return input
+
+
 def find(
     *,
     plugin_handle: int,
@@ -29,6 +34,9 @@ def find(
     thumb (optional): passed via setArtwork() of xbmcgui.ListItem class instance method. This should be a URL of a TV show poster, for example.
     """
     mal = MyAnimeList(settings.client_id)
+    title = _clean_title(title)
+    if len(title) == 1:
+        return
     result = mal.find_anime(title)
     for anime in [item.node for item in result.data]:
         for title in anime.all_titles:
@@ -66,7 +74,7 @@ def getdetails(*, plugin_handle: int, settings: AddOnSettings, url: str):
     # tags.setUserRating(anime.mean)
     tags.setPlot(anime.synopsis)
     if anime.background:
-        tags.setTagline(anime.background)
+        tags.setTagLine(anime.background)
     tags.setEpisodeGuide(f"{url}/episodes?count={anime.num_episodes}")
     tags.setUniqueIDs({"myanimelist": str(anime_id)}, defaultuniqueid="myanimelist")
 
@@ -271,7 +279,7 @@ def route(params: Dict[str, str], *, plugin_handle: int):
             k: v for k, v in params.items() if k != "action" and k != "pathSettings"
         }
         settings = AddOnSettings.from_json(params.get("pathSettings") or "{}")
-        xbmc.log(f"{action}: {kwargs}", xbmc.LOGWARNING)
+        xbmc.log(f"{action}: {kwargs}", xbmc.LOGDEBUG)
         return func(plugin_handle=plugin_handle, settings=settings, **kwargs)
     else:
         xbmc.log(f"unsupported action: {action} {params}", xbmc.LOGWARNING)
