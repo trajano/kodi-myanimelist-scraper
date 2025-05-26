@@ -59,7 +59,7 @@ def getdetails(*, plugin_handle: int, settings: AddOnSettings, url: str):
         )
     liz = xbmcgui.ListItem(anime.title, offscreen=True)
     tags = liz.getVideoInfoTag()
-    tags.setTitle(anime.en_title)
+    tags.setTitle(anime.get_title(settings.preferred_language))
     tags.setOriginalTitle(anime.original_title)
     # tags.setSortTitle("2")
     # tags.setUserRating(anime.mean)

@@ -28,8 +28,12 @@ msgctxt "#20000"
 msgid "Client ID"
 msgstr ""
 
-msgctxt "#30001"
-msgid "Preferred certification country"
+msgctxt "#20010"
+msgid "Preferred language"
+msgstr ""
+
+msgctxt "#20011"
+msgid "This is the language that will be chosen for the title."
 msgstr ""
 
 msgctxt "#30002"

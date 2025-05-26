@@ -10,3 +10,4 @@ from dataclasses_json import (
 @dataclass
 class AddOnSettings(DataClassJsonMixin):
     client_id: str
+    preferred_language: str

@@ -13,55 +13,17 @@
 						<heading>20000</heading>
 					</control>
 				</setting>
-				<setting id="tmdbcertcountry" type="string" label="30001" help="">
+				<setting id="preferred_language" type="string" label="20010" help="20011">
 					<level>0</level>
-					<default>us</default>
+					<default>en</default>
 					<constraints>
 						<options>
-							<option>au</option>
-							<option>bg</option>
-							<option>br</option>
-							<option>by</option>
-							<option>ca</option>
-							<option>cz</option>
-							<option>de</option>
-							<option>dk</option>
-							<option>ee</option>
-							<option>es</option>
-							<option>fi</option>
-							<option>fr</option>
-							<option>gb</option>
-							<option>ge</option>
-							<option>gr</option>
-							<option>hr</option>
-							<option>hu</option>
-							<option>id</option>
-							<option>il</option>
-							<option>in</option>
-							<option>it</option>
-							<option>ir</option>
-							<option>jp</option>
-							<option>kr</option>
-							<option>lt</option>
-							<option>lv</option>
-							<option>mx</option>
-							<option>nl</option>
-							<option>no</option>
-							<option>pl</option>
-							<option>pt</option>
-							<option>ru</option>
-							<option>si</option>
-							<option>sv</option>
-							<option>th</option>
-							<option>tr</option>
-							<option>ua</option>
-							<option>us</option>
-							<option>vn</option>
-							<option>zh</option>
+							<option>en</option>
+							<option>ja</option>
 						</options>
 					</constraints>
 					<control type="list" format="string">
-						<heading>30001</heading>
+						<heading>20010</heading>
 					</control>
 				</setting>
 				<setting id="usecertprefix" type="boolean" label="30002" help="">

@@ -118,6 +118,16 @@ class MyAnimeListAnime(DataClassJsonMixin):
                 return self.alternative_titles.en
         return self.title
 
+    def get_title(self, language: str) -> str:
+        if self.alternative_titles is not None:
+            if language == "en" and self.alternative_titles.en is not None:
+                return self.alternative_titles.en
+            elif language == "ja" and self.alternative_titles.ja is not None:
+                return self.alternative_titles.ja
+            elif self.alternative_titles.titles is not None:
+                return self.alternative_titles.titles.get(language, self.title)
+        return self.title
+
     @property
     def mpaa_rating(self) -> Optional[str]:
         if self.rating == "g":
