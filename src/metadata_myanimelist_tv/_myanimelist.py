@@ -112,6 +112,13 @@ class MyAnimeListAnime(DataClassJsonMixin):
         return self.title
 
     @property
+    def en_title(self) -> str:
+        if self.alternative_titles is not None:
+            if self.alternative_titles.en is not None:
+                return self.alternative_titles.en
+        return self.title
+
+    @property
     def mpaa_rating(self) -> Optional[str]:
         if self.rating == "g":
             return "G"

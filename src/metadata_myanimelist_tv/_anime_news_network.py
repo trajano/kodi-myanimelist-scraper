@@ -67,6 +67,8 @@ class AnimeNewsNetworkEncyclopediaEntry:
     precision: str
     episodes: List[AnimeNewsNetworkEpisode]
     cast: List[AnimeNewsNetworkCastMember]
+    # This is a list of pictures that are ordered by resolution.
+    pictures: List[str]
 
     # this is not a json
     def __init__(self, el: ET.Element):
@@ -77,9 +79,14 @@ class AnimeNewsNetworkEncyclopediaEntry:
         self.precision = el.attrib["precision"]
         self.episodes = []
         self.cast = []
+        self.pictures = []
         for info_element in el.iter("info"):
-            # Extract the pictures
-            pass
+            if info_element.attrib["type"] == "Picture":
+                for img in info_element.iter("img"):
+                    src = img.attrib["src"]
+                    if src is not None:
+                        self.pictures.append(src)
+                pass
         for episode_element in el.iter("episode"):
             self.episodes.append(AnimeNewsNetworkEpisode(episode_element))
         for cast_element in el.iter("cast"):
@@ -87,6 +94,14 @@ class AnimeNewsNetworkEncyclopediaEntry:
 
     def get_episode(self, episode_num) -> Optional[AnimeNewsNetworkEpisode]:
         return next((ep for ep in self.episodes if ep.number == episode_num), None)
+
+    @property
+    def picture(self) -> str:
+        return self.pictures[-1]
+
+    @property
+    def thumbnail(self) -> str:
+        return self.pictures[0]
 
 
 class AnimeNewsNetworkEncyclopedia:

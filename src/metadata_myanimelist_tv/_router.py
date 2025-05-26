@@ -59,7 +59,7 @@ def getdetails(*, plugin_handle: int, settings: AddOnSettings, url: str):
         )
     liz = xbmcgui.ListItem(anime.title, offscreen=True)
     tags = liz.getVideoInfoTag()
-    tags.setTitle(anime.title)
+    tags.setTitle(anime.en_title)
     tags.setOriginalTitle(anime.original_title)
     # tags.setSortTitle("2")
     # tags.setUserRating(anime.mean)
@@ -137,11 +137,14 @@ def getdetails(*, plugin_handle: int, settings: AddOnSettings, url: str):
             [
                 xbmc.Actor(
                     castmember.person,
-                    f"{castmember.role} ({castmember.lang})",
+                    castmember.role_label,
                     order=castmember.order,
                 )
                 for castmember in ann_anime.cast
             ]
+        )
+        tags.addAvailableArtwork(
+            ann_anime.picture, arttype="poster", preview=ann_anime.thumbnail
         )
 
     xbmcplugin.setResolvedUrl(handle=plugin_handle, succeeded=True, listitem=liz)
