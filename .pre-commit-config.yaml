@@ -15,7 +15,8 @@ repos:
     rev: v0.16.0
     hooks:
       - id: yamlfmt
-  - repo: https://github.com/RobertCraigie/pyright-python
-    rev: v1.1.401
-    hooks:
-      - id: pyright
+# - repo: https://github.com/RobertCraigie/pyright-python
+
+#   rev: v1.1.401
+#   hooks:
+#     - id: pyright

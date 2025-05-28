@@ -1,4 +1,7 @@
 __pycache__/
 dist/
 addon.xml
+# test
 .env
+anime-files.xml.gz
+anime-files.xml

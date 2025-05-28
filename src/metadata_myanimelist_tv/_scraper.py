@@ -9,12 +9,13 @@ from ._myanimelist import MyAnimeList
 from ._anime_news_network import AnimeNewsNetworkEncyclopedia
 from urllib.parse import urlparse, parse_qs
 from kodi_addon.protocols import TvShowScraper
+import re
 
 
 class MyAnimeListScraper(TvShowScraper):
     @staticmethod
     def _clean_title(input: str) -> str:
-        input = input.replace("[SakuraCircle]", "")
+        input = re.sub(r"\b\[[^\]+?\]\B", "", input)
         return input
 
     def __init__(self, *, plugin_handle: int, settings: AddOnSettings):

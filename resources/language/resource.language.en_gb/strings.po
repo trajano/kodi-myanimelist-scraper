@@ -36,6 +36,60 @@ msgctxt "#20011"
 msgid "This is the language that will be chosen for the title."
 msgstr ""
 
+msgctxt "#20020"
+msgid "Client Version"
+msgstr ""
+
+msgctxt "#20030"
+msgid "MyAnimeList"
+msgstr ""
+
+msgctxt "#20040"
+msgid "AniDB"
+msgstr ""
+
+msgctxt "#20050"
+msgid "Metadata source"
+msgstr ""
+
+msgctxt "#20051"
+msgid "Metadata source"
+msgstr ""
+
+msgctxt "#20060"
+msgid "anime-titles.xml last updated on"
+msgstr ""
+
+msgctxt "#20061"
+msgid "Specifies when the anime titles was last updated.  If it is more than 1 day it will refresh on next load."
+msgstr ""
+
+msgctxt "#20070"
+msgid "Proxy for AniDB API requests"
+msgstr ""
+
+msgctxt "#20071"
+msgid "This is the base URL for the anidb httpapi proxy."
+msgstr ""
+
+msgctxt "#20080"
+msgid "Proxy is anidb-proxy"
+msgstr ""
+
+msgctxt "#20081"
+msgid "If checked, then all requests for anidb get routed to the httpapi of the proxy."
+msgstr ""
+
+
+msgctxt "#10001"
+msgid "English"
+msgstr ""
+
+msgctxt "#10002"
+msgid "Japanese"
+msgstr ""
+
+
 msgctxt "#30002"
 msgid "Include certification prefix"
 msgstr ""
